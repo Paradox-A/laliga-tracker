@@ -1,0 +1,1628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LaLiga 2026-27 Tracker</title>
+<style>
+  :root {
+    --bg: #f6f1e7; --card: #ffffff; --text: #1a1a1a; --muted: #6b6b6b; --border: #e2ddd0;
+    --cl: #d6f5d6; --cl-text: #1a6b1a; --el: #d6e8ff; --el-text: #1a4a8a;
+    --ecl: #e0d6ff; --ecl-text: #4a1a8a; --rel: #ffd6d6; --rel-text: #8a1a1a;
+    --accent: #ee8a09; --tab-bg: #eee6d6; --tab-active: #ee8a09; --tab-active-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16131a; --card: #211d29; --text: #f0ede4; --muted: #a39d8f; --border: #3a3444;
+      --cl: #143d14; --cl-text: #8fe08f; --el: #143355; --el-text: #9cc4f5;
+      --ecl: #2e1a55; --ecl-text: #c9b3f5; --rel: #551a1a; --rel-text: #f5a3a3;
+      --accent: #ffab40; --tab-bg: #2a2534; --tab-active: #ffab40; --tab-active-text: #16131a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16131a; --card: #211d29; --text: #f0ede4; --muted: #a39d8f; --border: #3a3444;
+    --cl: #143d14; --cl-text: #8fe08f; --el: #143355; --el-text: #9cc4f5;
+    --ecl: #2e1a55; --ecl-text: #c9b3f5; --rel: #551a1a; --rel-text: #f5a3a3;
+    --accent: #ffab40; --tab-bg: #2a2534; --tab-active: #ffab40; --tab-active-text: #16131a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px 16px 60px; }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; color: var(--accent); }
+  .updated { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    background: var(--tab-bg); color: var(--text); border: none; border-radius: 8px;
+    padding: 10px 16px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .tab-btn.active { background: var(--tab-active); color: var(--tab-active-text); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; overflow-x: auto; }
+  h2 { font-size: 1.1rem; margin-top: 0; }
+  .intro { font-size: 0.88rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.85rem; white-space: nowrap; }
+  th, td { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; }
+  td.team, th.team { text-align: left; }
+  .crest { width: 16px; height: 16px; vertical-align: middle; margin-right: 6px; }
+  .pos { font-weight: 700; } .pts { font-weight: 700; }
+  tr.cl { background: var(--cl); color: var(--cl-text); }
+  tr.el { background: var(--el); color: var(--el-text); }
+  tr.ecl { background: var(--ecl); color: var(--ecl-text); }
+  tr.rel { background: var(--rel); color: var(--rel-text); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; margin-top: 10px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .dot.cl { background: var(--cl); } .dot.el { background: var(--el); }
+  .dot.ecl { background: var(--ecl); } .dot.rel { background: var(--rel); }
+  .note { color: var(--muted); font-size: 0.8rem; margin-top: 8px; }
+  .explainer { background: var(--tab-bg); border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+  .explainer b { color: var(--accent); }
+  footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 30px; }
+  details.stat-accordion { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  details.stat-accordion summary {
+    cursor: pointer; padding: 14px 16px; font-weight: 700; font-size: 0.98rem;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+    background: var(--card);
+  }
+  details.stat-accordion summary::-webkit-details-marker { display: none; }
+  details.stat-accordion summary::after { content: "+"; font-size: 1.2rem; color: var(--muted); }
+  details.stat-accordion[open] summary::after { content: "−"; }
+  details.stat-accordion summary .sub { font-weight: 400; font-size: 0.78rem; color: var(--muted); margin-top: 2px; display: block; }
+  details.stat-accordion .accordion-body { padding: 0 16px 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>LaLiga 2026-27 Tracker</h1>
+  <div class="updated">Matchday 2 · Last updated August 23, 2026 03:19 UTC</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('table')">League Table</button>
+    <button class="tab-btn" onclick="showTab('club')">Club Stats</button>
+    <button class="tab-btn" onclick="showTab('player')">Player Stats</button>
+  </div>
+
+  <div id="tab-table" class="tab-panel active">
+    <div class="card">
+      <h2>League Table</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th></tr></thead>
+        <tbody>
+    <tr class="cl">
+      <td class="pos">1</td>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Sevilla FC</td>
+      <td>2</td><td>2</td><td>0</td><td>0</td>
+      <td>5</td><td>2</td><td>+3</td>
+      <td class="pts">6</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">2</td>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Alavés</td>
+      <td>2</td><td>1</td><td>1</td><td>0</td>
+      <td>4</td><td>1</td><td>+3</td>
+      <td class="pts">4</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">3</td>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Espanyol</td>
+      <td>2</td><td>1</td><td>0</td><td>1</td>
+      <td>4</td><td>2</td><td>+2</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">4</td>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Atleti</td>
+      <td>1</td><td>1</td><td>0</td><td>0</td>
+      <td>2</td><td>0</td><td>+2</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="el">
+      <td class="pos">5</td>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Real Madrid</td>
+      <td>1</td><td>1</td><td>0</td><td>0</td>
+      <td>2</td><td>1</td><td>+1</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="ecl">
+      <td class="pos">6</td>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Real Betis</td>
+      <td>1</td><td>1</td><td>0</td><td>0</td>
+      <td>1</td><td>0</td><td>+1</td>
+      <td class="pts">3</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Santander</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>2</td><td>2</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Villarreal</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>2</td><td>2</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">9</td>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest"> Deportivo</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>1</td><td>1</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">9</td>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest"> Elche</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>1</td><td>1</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">11</td>
+      <td class="team"><img src="https://crests.football-data.org/558.png" alt="" class="crest"> Celta</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">11</td>
+      <td class="team"><img src="https://crests.football-data.org/95.png" alt="" class="crest"> Valencia</td>
+      <td>1</td><td>0</td><td>1</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">13</td>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Rayo Vallecano</td>
+      <td>2</td><td>0</td><td>1</td><td>1</td>
+      <td>2</td><td>3</td><td>-1</td>
+      <td class="pts">1</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">14</td>
+      <td class="team"><img src="https://crests.football-data.org/79.png" alt="" class="crest"> Osasuna</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">14</td>
+      <td class="team"><img src="https://crests.football-data.org/81.png" alt="" class="crest"> Barça</td>
+      <td>0</td><td>0</td><td>0</td><td>0</td>
+      <td>0</td><td>0</td><td>0</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">16</td>
+      <td class="team"><img src="https://crests.football-data.org/92.png" alt="" class="crest"> Real Sociedad</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>0</td><td>1</td><td>-1</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="">
+      <td class="pos">17</td>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Athletic</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>1</td><td>3</td><td>-2</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">18</td>
+      <td class="team"><img src="https://crests.football-data.org/84.png" alt="" class="crest"> Málaga</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>0</td><td>2</td><td>-2</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">19</td>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest"> Getafe</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>0</td><td>3</td><td>-3</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">19</td>
+      <td class="team"><img src="https://crests.football-data.org/88.png" alt="" class="crest"> Levante</td>
+      <td>1</td><td>0</td><td>0</td><td>1</td>
+      <td>0</td><td>3</td><td>-3</td>
+      <td class="pts">0</td><td class="form">—</td>
+    </tr></tbody>
+      </table>
+      <div class="note"><b>P</b> Played &nbsp;·&nbsp; <b>W</b> Won &nbsp;·&nbsp; <b>D</b> Drawn &nbsp;·&nbsp; <b>L</b> Lost &nbsp;·&nbsp; <b>GF</b> Goals For &nbsp;·&nbsp; <b>GA</b> Goals Against &nbsp;·&nbsp; <b>GD</b> Goal Difference (GF minus GA — the first tiebreaker when teams are level on points) &nbsp;·&nbsp; <b>Pts</b> Points (3 for a win, 1 for a draw, 0 for a loss) &nbsp;·&nbsp; <b>Form</b> results of the last 5 games, oldest to newest</div>
+      <div class="legend">
+        <span><span class="dot cl"></span>Champions League (1-4)</span>
+        <span><span class="dot el"></span>Europa League (5)</span>
+        <span><span class="dot ecl"></span>Conference League (6)</span>
+        <span><span class="dot rel"></span>Relegation (18-20)</span>
+      </div>
+      <div class="note">European qualification spots can shift based on cup-competition winners already qualifying via league position — actual allocations confirm toward season's end. Relegation sends the bottom 3 down to Segunda División.</div>
+    </div>
+
+    <div class="card">
+      <h2>European Race</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>Zone</th><th>Pts</th><th>Games Left</th><th>Gap to 4th</th></tr></thead>
+        <tbody>
+    <tr class="cl">
+      <td class="pos">1</td>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Sevilla FC</td>
+      <td>Champions League</td><td>6</td><td>36</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">2</td>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Alavés</td>
+      <td>Champions League</td><td>4</td><td>36</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">3</td>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Espanyol</td>
+      <td>Champions League</td><td>3</td><td>36</td>
+      <td>—</td>
+    </tr>
+    <tr class="cl">
+      <td class="pos">4</td>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Atleti</td>
+      <td>Champions League</td><td>3</td><td>37</td>
+      <td>—</td>
+    </tr>
+    <tr class="el">
+      <td class="pos">5</td>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Real Madrid</td>
+      <td>Europa League</td><td>3</td><td>37</td>
+      <td>Level with 4th</td>
+    </tr>
+    <tr class="ecl">
+      <td class="pos">6</td>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Real Betis</td>
+      <td>Conference League</td><td>3</td><td>37</td>
+      <td>Level with 4th</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Santander</td>
+      <td>Chasing pack</td><td>1</td><td>37</td>
+      <td>2 pt behind 4th</td>
+    </tr>
+    <tr class="">
+      <td class="pos">7</td>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Villarreal</td>
+      <td>Chasing pack</td><td>1</td><td>37</td>
+      <td>2 pt behind 4th</td>
+    </tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Relegation Watch</h2>
+      <table>
+        <thead><tr><th>#</th><th class="team">Team</th><th>Pts</th><th>Games Left</th><th>What it takes to stay up</th></tr></thead>
+        <tbody>
+    <tr class="">
+      <td class="pos">14</td>
+      <td class="team"><img src="https://crests.football-data.org/81.png" alt="" class="crest"> Barça</td>
+      <td>0</td><td>38</td><td>Needs 38 pts from 38 games (1.00 pts/game pace)</td>
+    </tr>
+    <tr class="">
+      <td class="pos">16</td>
+      <td class="team"><img src="https://crests.football-data.org/92.png" alt="" class="crest"> Real Sociedad</td>
+      <td>0</td><td>37</td><td>Needs 38 pts from 37 games (1.03 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="">
+      <td class="pos">17</td>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Athletic</td>
+      <td>0</td><td>37</td><td>Needs 38 pts from 37 games (1.03 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">18</td>
+      <td class="team"><img src="https://crests.football-data.org/84.png" alt="" class="crest"> Málaga</td>
+      <td>0</td><td>37</td><td>Needs 38 pts from 37 games (1.03 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">19</td>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest"> Getafe</td>
+      <td>0</td><td>37</td><td>Needs 38 pts from 37 games (1.03 pts/game — above league-average pace)</td>
+    </tr>
+    <tr class="rel">
+      <td class="pos">19</td>
+      <td class="team"><img src="https://crests.football-data.org/88.png" alt="" class="crest"> Levante</td>
+      <td>0</td><td>37</td><td>Needs 38 pts from 37 games (1.03 pts/game — above league-average pace)</td>
+    </tr></tbody>
+      </table>
+      <div class="note">"Safety" modeled as ~38 points, a rough historical LaLiga survival benchmark.</div>
+    </div>
+  </div>
+
+  <div id="tab-club" class="tab-panel">
+    <div class="explainer">
+      <b>New to LaLiga?</b> The table tells you <i>where</i> a team stands, but not <i>how</i> they got there. These stats show the underlying strengths and weaknesses — a team can have a good record while quietly being fragile defensively, or vice versa.
+    </div>
+
+    <div class="card">
+      <h2>Defensive Strength: Clean Sheets</h2>
+      <div class="explainer">A <b>clean sheet</b> is a game where a team doesn't concede at all. It's the single clearest sign of defensive solidity — LaLiga title winners are almost always among the league's clean-sheet leaders, because you can't lose a game you don't concede in.</div>
+      <table>
+        <thead><tr><th class="team">Team</th><th>Played</th><th>Clean Sheets</th><th>Goals Conceded / Game</th><th>Failed to Score</th></tr></thead>
+        <tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Atleti</td>
+      <td>1</td><td>1</td>
+      <td>0.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Real Betis</td>
+      <td>1</td><td>1</td>
+      <td>0.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/95.png" alt="" class="crest"> Valencia</td>
+      <td>1</td><td>1</td>
+      <td>0.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/558.png" alt="" class="crest"> Celta</td>
+      <td>1</td><td>1</td>
+      <td>0.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Alavés</td>
+      <td>2</td><td>1</td>
+      <td>0.50</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Espanyol</td>
+      <td>2</td><td>1</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest"> Deportivo</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest"> Elche</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/92.png" alt="" class="crest"> Real Sociedad</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Real Madrid</td>
+      <td>1</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Sevilla FC</td>
+      <td>2</td><td>0</td>
+      <td>1.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Santander</td>
+      <td>1</td><td>0</td>
+      <td>2.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Villarreal</td>
+      <td>1</td><td>0</td>
+      <td>2.00</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/84.png" alt="" class="crest"> Málaga</td>
+      <td>1</td><td>0</td>
+      <td>2.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest"> Getafe</td>
+      <td>1</td><td>0</td>
+      <td>3.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Rayo Vallecano</td>
+      <td>2</td><td>0</td>
+      <td>1.50</td><td>0</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/88.png" alt="" class="crest"> Levante</td>
+      <td>1</td><td>0</td>
+      <td>3.00</td><td>1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Athletic</td>
+      <td>1</td><td>0</td>
+      <td>3.00</td><td>0</td>
+    </tr></tbody>
+      </table>
+      <div class="note"><b>Failed to Score</b> counts games where a team didn't score at all — a blunt but telling sign of attacking struggles.</div>
+    </div>
+
+    <div class="card">
+      <h2>Home Fortress vs. Road Warriors</h2>
+      <div class="explainer">Some teams are much stronger at home than away (or the reverse) — this is one of the oldest storylines in football, and it's especially pronounced in Spain given the size and atmosphere of some LaLiga stadiums. <b>Points per game (PPG)</b> at home vs. away shows exactly how lopsided that split is. <b>Form</b> is the last 5 results (most recent last) — a better read on momentum than the season-long record.</div>
+      <table>
+        <thead><tr><th class="team">Team</th><th>Form (last 5)</th><th>Home Record</th><th>Away Record</th></tr></thead>
+        <tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Sevilla FC</td>
+      <td>WW</td>
+      <td>3pts / 1g (3.00/g)</td>
+      <td>3pts / 1g (3.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Alavés</td>
+      <td>WD</td>
+      <td>3pts / 1g (3.00/g)</td>
+      <td>1pts / 1g (1.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Espanyol</td>
+      <td>WL</td>
+      <td>3pts / 2g (1.50/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Atleti</td>
+      <td>W</td>
+      <td>3pts / 1g (3.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Real Betis</td>
+      <td>W</td>
+      <td>3pts / 1g (3.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Real Madrid</td>
+      <td>W</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>3pts / 1g (3.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Rayo Vallecano</td>
+      <td>LD</td>
+      <td>1pts / 1g (1.00/g)</td>
+      <td>0pts / 1g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Santander</td>
+      <td>D</td>
+      <td>1pts / 1g (1.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Villarreal</td>
+      <td>D</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>1pts / 1g (1.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest"> Deportivo</td>
+      <td>D</td>
+      <td>1pts / 1g (1.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest"> Elche</td>
+      <td>D</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>1pts / 1g (1.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/95.png" alt="" class="crest"> Valencia</td>
+      <td>D</td>
+      <td>1pts / 1g (1.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/558.png" alt="" class="crest"> Celta</td>
+      <td>D</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>1pts / 1g (1.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest"> Getafe</td>
+      <td>L</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>0pts / 1g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/88.png" alt="" class="crest"> Levante</td>
+      <td>L</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>0pts / 1g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/84.png" alt="" class="crest"> Málaga</td>
+      <td>L</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>0pts / 1g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/92.png" alt="" class="crest"> Real Sociedad</td>
+      <td>L</td>
+      <td>0pts / 0g (0.00/g)</td>
+      <td>0pts / 1g (0.00/g)</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Athletic</td>
+      <td>L</td>
+      <td>0pts / 1g (0.00/g)</td>
+      <td>0pts / 0g (0.00/g)</td>
+    </tr></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Biggest Wins &amp; Heaviest Losses</h2>
+      <div class="explainer">Goal margin matters beyond the 3 points — a big win boosts goal difference (which breaks ties in the table) and can be a statement result against a rival, especially in a Clásico or Derbi.</div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <table style="flex:1; min-width:220px;">
+          <thead><tr><th class="team">Team</th><th>Biggest Win</th></tr></thead>
+          <tbody><tr><td>Espanyol</td><td>3-0 vs Levante</td></tr><tr><td>Alavés</td><td>3-0 vs Getafe</td></tr><tr><td>Sevilla FC</td><td>3-1 vs Athletic</td></tr><tr><td>Atleti</td><td>2-0 vs Málaga</td></tr><tr><td>Real Madrid</td><td>2-1 vs Espanyol</td></tr></tbody>
+        </table>
+        <table style="flex:1; min-width:220px;">
+          <thead><tr><th class="team">Team</th><th>Heaviest Loss</th></tr></thead>
+          <tbody><tr><td>Levante</td><td>0-3 vs Espanyol</td></tr><tr><td>Getafe</td><td>0-3 vs Alavés</td></tr><tr><td>Málaga</td><td>0-2 vs Atleti</td></tr><tr><td>Athletic</td><td>1-3 vs Sevilla FC</td></tr><tr><td>Real Sociedad</td><td>0-1 vs Real Betis</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top: -8px;">Not shown: possession, shots, passing accuracy, tackles, or expected goals (xG) — these require a paid data source. Everything above is derived directly from final match scores.</div>
+  </div>
+
+  <div id="tab-player" class="tab-panel">
+    <div class="explainer">
+      <b>New to LaLiga?</b> The <b>Pichichi Trophy</b> (top scorer) is the league's most prestigious individual award. But goals alone don't capture everything a player contributes — this table adds context.
+    </div>
+    <div class="card">
+      <h2>Pichichi Race &amp; Goal Involvements</h2>
+      <div class="explainer">
+        <b>Goals</b>: the headline number, and what decides the Pichichi Trophy.<br>
+        <b>Assists</b>: the pass that directly leads to a goal — a measure of creativity, not just finishing.<br>
+        <b>Goal Involvements</b> (goals + assists): a fuller picture of a player's attacking output — a player with 8 goals and 10 assists is arguably more valuable than one with 12 goals and 0 assists.<br>
+        <b>Goals/Game</b>: raw totals favor players who've played more games — this rate stat levels the comparison.<br>
+        <b>Penalties</b>: shown separately since penalty goals are viewed differently from open-play goals (some fans discount them when judging a striker's true quality).
+      </div>
+      <table><thead><tr><th class="team">Player</th><th>Club</th><th>Games</th><th>Goals</th><th>Assists</th><th>Goal Inv.</th><th>Pens</th><th>Goals/Game</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Mariano Díaz</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="pts">2</td>
+      <td class="">2</td>
+      <td class="">4</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Roberto Fernández</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="pts">2</td>
+      <td class="">—</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Oso</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">1</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Isaac</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">1</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Nahuel Tenaglia</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Mikel Rodríguez</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Álvaro García</td>
+      <td>Rayo Vallecano</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Jon Guridi</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>1</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Peque</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>1</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Andrés Martín</td>
+      <td>Santander</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>1</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Sergio Martínez</td>
+      <td>Santander</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Pape Gueye</td>
+      <td>Villarreal</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Nicolas Pépé</td>
+      <td>Villarreal</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Tyrhys Dolan</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest"> Pierre-Emerick Aubameyang</td>
+      <td>Deportivo</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest"> Marc Aguado</td>
+      <td>Elche</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Kang-in Lee</td>
+      <td>Atleti</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Álex Baena</td>
+      <td>Atleti</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Sergio Camello</td>
+      <td>Rayo Vallecano</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Rodrigo Riquelme</td>
+      <td>Real Betis</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Chidera Ejuke</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Aitor Paredes Casamichana</td>
+      <td>Athletic</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Jude Bellingham</td>
+      <td>Real Madrid</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Álex Calatrava</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Carlos Espí</td>
+      <td>Real Madrid</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr></tbody></table>
+      
+      <div class="note">Not shown: shots, expected goals (xG), key passes, dribbles, or tackles — this combined table's data source only tracks goals, assists, penalties, and appearances. Deeper stats (like xG) require a paid provider.</div>
+    </div>
+
+    <div class="explainer" style="margin-top: 4px;">
+      <b>Want just one ranking at a time?</b> The sections below break out individual rankings — Assists, Yellow Cards, and Red Cards pull real numbers directly from LaLiga's own site.
+    </div>
+
+    <details class="stat-accordion">
+      <summary>Most Goals <span class="sub">The Pichichi race — decided by goals alone, nothing else</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Goals</b> is the headline number and what the actual Pichichi Trophy is decided by. It's the most-watched individual stat in the league, but it rewards finishers over creators — see "Most Goals & Assists" below for the fuller picture.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Games</th><th>Goals</th><th>Assists</th><th>Goal Inv.</th><th>Pens</th><th>Goals/Game</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Mariano Díaz</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="pts">2</td>
+      <td class="">2</td>
+      <td class="">4</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Roberto Fernández</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="pts">2</td>
+      <td class="">—</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Oso</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">1</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Isaac</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">1</td>
+      <td class="">2</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Nahuel Tenaglia</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Mikel Rodríguez</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Álvaro García</td>
+      <td>Rayo Vallecano</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Jon Guridi</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>1</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Peque</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>1</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Andrés Martín</td>
+      <td>Santander</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>1</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Sergio Martínez</td>
+      <td>Santander</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Pape Gueye</td>
+      <td>Villarreal</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Nicolas Pépé</td>
+      <td>Villarreal</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Tyrhys Dolan</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest"> Pierre-Emerick Aubameyang</td>
+      <td>Deportivo</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest"> Marc Aguado</td>
+      <td>Elche</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Kang-in Lee</td>
+      <td>Atleti</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Álex Baena</td>
+      <td>Atleti</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Sergio Camello</td>
+      <td>Rayo Vallecano</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Rodrigo Riquelme</td>
+      <td>Real Betis</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Chidera Ejuke</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Aitor Paredes Casamichana</td>
+      <td>Athletic</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Jude Bellingham</td>
+      <td>Real Madrid</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Álex Calatrava</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Carlos Espí</td>
+      <td>Real Madrid</td>
+      <td>1</td>
+      <td class="pts">1</td>
+      <td class="">—</td>
+      <td class="">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Assists <span class="sub">Who's creating goals for others, not just scoring them</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Assists</b> credit the pass (or occasionally the touch) that directly leads to a goal. It's the clearest single measure of creativity — a player can be hugely valuable to a team's attack without scoring much themselves.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Mins Played</th><th>Assists</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest">Mariano Díaz</td>
+      <td>ALA</td>
+      <td>61</td>
+      <td class="pts">2</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest">Javi Hernández</td>
+      <td>ESP</td>
+      <td>157</td>
+      <td class="pts">2</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Isaac Romero</td>
+      <td>SEV</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Joaquín Martínez Gauna</td>
+      <td>SEV</td>
+      <td>156</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest">Jorge de Frutos</td>
+      <td>RAY</td>
+      <td>180</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest">Rafel Bauzà</td>
+      <td>ESP</td>
+      <td>42</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest">Georges Mikautadze</td>
+      <td>VIL</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest">Alberto Moleiro</td>
+      <td>VIL</td>
+      <td>56</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest">Lorenzo Amatucci</td>
+      <td>DEP</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest">Gonzalo Villar</td>
+      <td>ELC</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest">Dávid Hancko</td>
+      <td>ATM</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest">Cucho Hernández</td>
+      <td>BET</td>
+      <td>80</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest">Yeray Álvarez</td>
+      <td>ATH</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest">Arda Güler</td>
+      <td>RMA</td>
+      <td>64</td>
+      <td class="pts">1</td>
+    </tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Goals &amp; Assists <span class="sub">Total attacking output — often a better "who's actually best" ranking than goals alone</span></summary>
+      <div class="accordion-body">
+        <div class="explainer"><b>Goal Involvements</b> (goals + assists) gives a fuller picture of a player's attacking output than the Pichichi table does on its own. A player with 8 goals and 10 assists has been directly involved in 18 goals — arguably more valuable to their team than someone with 12 goals and 0 assists, even though the latter would top the pure scoring chart.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Games</th><th>Goals</th><th>Assists</th><th>Goal Inv.</th><th>Pens</th><th>Goals/Game</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Mariano Díaz</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="">2</td>
+      <td class="">2</td>
+      <td class="pts">4</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Roberto Fernández</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="">2</td>
+      <td class="">—</td>
+      <td class="pts">2</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Oso</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">1</td>
+      <td class="pts">2</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Isaac</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">1</td>
+      <td class="pts">2</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Nahuel Tenaglia</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest"> Mikel Rodríguez</td>
+      <td>Alavés</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Álvaro García</td>
+      <td>Rayo Vallecano</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Jon Guridi</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>1</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Peque</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>1</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Andrés Martín</td>
+      <td>Santander</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>1</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/5335.png" alt="" class="crest"> Sergio Martínez</td>
+      <td>Santander</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Pape Gueye</td>
+      <td>Villarreal</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/94.png" alt="" class="crest"> Nicolas Pépé</td>
+      <td>Villarreal</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Tyrhys Dolan</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/560.png" alt="" class="crest"> Pierre-Emerick Aubameyang</td>
+      <td>Deportivo</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/285.png" alt="" class="crest"> Marc Aguado</td>
+      <td>Elche</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Kang-in Lee</td>
+      <td>Atleti</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/78.png" alt="" class="crest"> Álex Baena</td>
+      <td>Atleti</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest"> Sergio Camello</td>
+      <td>Rayo Vallecano</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/90.png" alt="" class="crest"> Rodrigo Riquelme</td>
+      <td>Real Betis</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest"> Chidera Ejuke</td>
+      <td>Sevilla FC</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest"> Aitor Paredes Casamichana</td>
+      <td>Athletic</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Jude Bellingham</td>
+      <td>Real Madrid</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest"> Álex Calatrava</td>
+      <td>Espanyol</td>
+      <td>2</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>0.50</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/86.png" alt="" class="crest"> Carlos Espí</td>
+      <td>Real Madrid</td>
+      <td>1</td>
+      <td class="">1</td>
+      <td class="">—</td>
+      <td class="pts">1</td>
+      <td>—</td>
+      <td>1.00</td>
+    </tr></tbody></table>
+      </div>
+    </details>
+
+    <div class="note">Also shown in each table: <b>Penalties</b> (shown separately since penalty goals are viewed differently from open-play ones), and <b>Goals/Game</b> (a rate stat, since raw totals favor players who've played more games).</div>
+
+    <details class="stat-accordion">
+      <summary>Most Yellow Cards <span class="sub">Discipline — persistent fouling, five in a season triggers an automatic ban</span></summary>
+      <div class="accordion-body">
+        <div class="explainer">A <b>yellow card</b> is a caution for a foul or unsporting behavior. Two in one match means a red card and an early shower. Accumulate enough yellows across the season and the player serves an automatic one-match ban — so this list is also a rough guide to who's one bad tackle away from missing a game.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Mins Played</th><th>Yellow Cards</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Jon Guridi</td>
+      <td>SEV</td>
+      <td>127</td>
+      <td class="pts">2</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Isaac Romero</td>
+      <td>SEV</td>
+      <td>90</td>
+      <td class="pts">2</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/80.png" alt="" class="crest">Álex Calatrava Torrado</td>
+      <td>ESP</td>
+      <td>138</td>
+      <td class="pts">2</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest">Denis Suárez</td>
+      <td>ALA</td>
+      <td>85</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest">Mariano Díaz</td>
+      <td>ALA</td>
+      <td>61</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest">Nahuel Tenaglia</td>
+      <td>ALA</td>
+      <td>180</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest">Antonio Blanco</td>
+      <td>ALA</td>
+      <td>179</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/263.png" alt="" class="crest">Abde Rebbach</td>
+      <td>ALA</td>
+      <td>179</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Gabriel Suazo</td>
+      <td>SEV</td>
+      <td>180</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Lucien Agoumé</td>
+      <td>SEV</td>
+      <td>180</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Gerard Fernández Castellano</td>
+      <td>SEV</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Miguel Sierra</td>
+      <td>SEV</td>
+      <td>115</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Nico Guillén</td>
+      <td>SEV</td>
+      <td>90</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest">Álvaro García</td>
+      <td>RAY</td>
+      <td>105</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest">Unai López</td>
+      <td>RAY</td>
+      <td>168</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest">Sergio Camello</td>
+      <td>RAY</td>
+      <td>116</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest">Pathé Ciss</td>
+      <td>RAY</td>
+      <td>180</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/87.png" alt="" class="crest">Fran Pérez</td>
+      <td>RAY</td>
+      <td>75</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest">Djené Dakonam</td>
+      <td>GET</td>
+      <td>81</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest">Mario Martín</td>
+      <td>GET</td>
+      <td>66</td>
+      <td class="pts">1</td>
+    </tr></tbody></table>
+      </div>
+    </details>
+
+    <details class="stat-accordion">
+      <summary>Most Red Cards <span class="sub">Sent off — the rest of the match (and usually more) missed</span></summary>
+      <div class="accordion-body">
+        <div class="explainer">A <b>red card</b> means immediate ejection from the match, leaving the team to play the rest of the game a player short, plus an automatic suspension (typically 1-3 games depending on severity) for the next match(es). It's the most serious in-game discipline outcome.</div>
+        <table><thead><tr><th class="team">Player</th><th>Club</th><th>Mins Played</th><th>Red Cards</th></tr></thead><tbody>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/559.png" alt="" class="crest">Kike Salas</td>
+      <td>SEV</td>
+      <td>88</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/82.png" alt="" class="crest">Francisco Femenía Far</td>
+      <td>GET</td>
+      <td>42</td>
+      <td class="pts">1</td>
+    </tr>
+    <tr>
+      <td class="team"><img src="https://crests.football-data.org/77.png" alt="" class="crest">Yuri Berchiche</td>
+      <td>ATH</td>
+      <td>11</td>
+      <td class="pts">1</td>
+    </tr></tbody></table>
+      </div>
+    </details>
+  </div>
+
+  <footer>Data: football-data.org &amp; laliga.com · Rebuilt periodically, not live-updating</footer>
+</div>
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
